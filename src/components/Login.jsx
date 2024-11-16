@@ -1,12 +1,36 @@
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../Providers/AuthProvider";
 
 const Login = () => {
-  const handleLogin = e => {
+  const { signInUser, signInWithGoogle } = useContext(AuthContext);
+  const navigate = useNavigate()
+  const handleLogin = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    console.log(email, password)
+    console.log(email, password);
+
+    signInUser(email, password)
+      .then((result) => {
+        console.log(result.user);
+        //cleanup input field
+        e.target.reset();
+        navigate("/")
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
+
+  const handleGoogleSignIn = () => {
+    signInWithGoogle()
+    .then(result => {
+      console.log(result.user);
+      navigate('/')
+    })
+    .catch(error => console.log(error.message))
   }
   return (
     <div className="hero ">
@@ -49,8 +73,15 @@ const Login = () => {
               <button className="btn btn-primary">Login</button>
             </div>
           </form>
-          <p>New to this Website? please <Link to={"/signUp"} className="hover:underline text-blue-300">Sign up</Link> </p>
+
+          <p>
+            New to this Website? please{" "}
+            <Link to={"/signUp"} className="hover:underline text-blue-300">
+              Sign up
+            </Link>{" "}
+          </p>
         </div>
+          <p onClick={handleGoogleSignIn} className="btn btn-outline mb-6">Sign Up with Google</p>
       </div>
     </div>
   );
